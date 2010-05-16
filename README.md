@@ -6,6 +6,7 @@ Prototype PR API wrapper - at the moment, async, depends on Ruby 1.9. Same API c
 
     require "postrank/api"
     EventMachine.synchrony do
+        api = PostRank::API.new(:appkey => 'someuser')
 
         igvita = api.feed_info(:feed => 'igvita.com')
         feed   = api.feed(:feed => igvita['id'])
