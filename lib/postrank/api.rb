@@ -1,4 +1,5 @@
 require 'em-synchrony'
+require 'digest/md5'
 require 'chronic'
 require 'json'
 require 'yajl'
@@ -75,7 +76,30 @@ module PostRank
       req[:query][:summary] = opts[:summary] if opts[:summary]
 
       http = EM::HttpRequest.new('http://api.postrank.com/v2/feed/engagement').post(req)
-      resp = parse(http.response)
+      parse(http.response)
+    end
+
+    def metrics(opts)
+      reverse = {}
+      urls = [opts[:url]].flatten.map do |url|
+        md5 = (url =~ /\w{32}/) ? url : Digest::MD5.hexdigest(url)
+        reverse[md5] = url
+
+        md5
+      end
+
+      req = {
+        :query => {
+          :appkey => @appkey,
+        },
+        :body => urls.map{|e| "url[]=#{e}"}.join("&")
+      }
+
+      http = EM::HttpRequest.new('http://api.postrank.com/v2/entry/metrics').post(req)
+      parse(http.response).inject({}) do |hash, v|
+        hash[reverse[v[0]]] = v[1]
+        hash
+      end
     end
 
     private

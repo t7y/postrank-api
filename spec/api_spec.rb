@@ -94,7 +94,7 @@ describe PostRank::API do
   end
 
   describe "Feed Engagement API" do
-    it "should fetch top posts for a feed" do
+    it "should fetch engagement for a feed" do
       EM.synchrony do
         eng = api.feed_engagement(:feed => IGVITA)
 
@@ -106,7 +106,7 @@ describe PostRank::API do
       end
     end
 
-    it "should fetch top posts for a feed" do
+    it "should fetch daily engagement for multiple feeds" do
       EM.synchrony do
         eng = api.feed_engagement({
                                     :feed => [IGVITA, EVERBURNING],
@@ -123,4 +123,30 @@ describe PostRank::API do
       end
     end
   end
+
+  describe "Metrics API" do
+    it "should fetch metrics for a collection of urls" do
+      EM.synchrony do
+        metrics = api.metrics(:url => ['http://www.igvita.com/', 'http://www.everburning.com/'])
+        metrics.keys.size.should == 2
+
+        metrics['http://www.igvita.com/'].class.should == Hash
+        metrics['http://www.everburning.com/'].class.should == Hash
+
+        EM.stop
+      end
+    end
+
+    it "should fetch metrics via url md5s" do
+      EM.synchrony do
+        metrics = api.metrics(:url => ['1c1a5357e8bd00128db845b2595d5ebe'])
+
+        metrics.keys.size.should == 1
+        metrics['1c1a5357e8bd00128db845b2595d5ebe'].class.should == Hash
+
+        EM.stop
+      end
+    end
+  end
+
 end
