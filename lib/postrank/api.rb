@@ -1,4 +1,5 @@
 require 'em-synchrony'
+require 'chronic'
 require 'json'
 require 'yajl'
 
@@ -53,6 +54,28 @@ module PostRank
 
       http = EM::HttpRequest.new('http://api.postrank.com/v2/feed/topposts/').get(req)
       parse(http.response)
+    end
+
+    def feed_engagement(opts)
+      opts[:start_time] ||= '1 month ago'
+      opts[:end_time]   ||= 'today'
+      opts[:summary]    = true if not opts.key?(:summary)
+
+      req = {
+        :query => {
+          :appkey     => @appkey,
+          :mode       => opts[:mode] || 'daily',
+          :start_time => Chronic.parse(opts[:start_time]).to_i,
+          :end_time => Chronic.parse(opts[:end_time]).to_i
+        },
+        :body => [opts[:feed]].flatten.map{|e| "feed[]=#{e}"}.join("&")
+      }
+
+      # TODO: fix in the API.. summary=false should not do summary!
+      req[:query][:summary] = opts[:summary] if opts[:summary]
+
+      http = EM::HttpRequest.new('http://api.postrank.com/v2/feed/engagement').post(req)
+      resp = parse(http.response)
     end
 
     private
