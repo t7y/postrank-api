@@ -51,5 +51,48 @@ describe PostRank::API do
         EM.stop
       end
     end
+
+    it "should retrieve 1 entry from a feed" do
+      EM.synchrony do
+        igvita = api.feed_info(:feed => 'igvita.com')
+        feed = api.feed(:feed => igvita['id'], :num => 1)
+
+        feed.class.should == Hash
+        feed['meta']['title'].should match(/igvita/)
+        feed['items'].size.should == 1
+
+        EM.stop
+      end
+    end
+
+    it "should retrieve entries matching a query" do
+      EM.synchrony do
+        igvita = api.feed_info(:feed => 'igvita.com')
+        feed = api.feed(:feed => igvita['id'], :q => 'abrakadabra')
+
+        feed.class.should == Hash
+        feed['meta']['title'].should match(/igvita/)
+        feed['items'].size.should == 0
+
+        EM.stop
+      end
+    end
   end
+
+  describe "Top Posts API" do
+    it "should fetch top posts for a feed" do
+      EM.synchrony do
+
+        igvita = api.feed_info(:feed => 'igvita.com')
+        feed = api.top_posts(:feed => igvita['id'], :num => 1)
+
+        feed.class.should == Hash
+        feed['meta']['title'].should match(/igvita/)
+        feed['items'].size.should == 1
+
+        EM.stop
+      end
+    end
+  end
+
 end

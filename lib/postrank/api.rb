@@ -41,6 +41,20 @@ module PostRank
       parse(http.response)
     end
 
+    def top_posts(opts)
+      req = {
+        :query => {
+          :appkey => @appkey,
+          :q      => opts[:q]     || '',
+          :num    => opts[:num]   || 10,
+          :id     => opts[:feed]
+        }
+      }
+
+      http = EM::HttpRequest.new('http://api.postrank.com/v2/feed/topposts/').get(req)
+      parse(http.response)
+    end
+
     private
 
       def parse(data)
