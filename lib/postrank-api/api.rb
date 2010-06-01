@@ -7,6 +7,7 @@ require 'yajl'
 
 module PostRank
   class API
+    V2_API_BASE = 'http://api.postrank.com/v2'
 
     def initialize(appkey)
       @appkey = appkey
@@ -16,12 +17,12 @@ module PostRank
       req = {
         :query => {
           :appkey => @appkey,
-          :noidex => opts[:noindex] || false,
+          :noindex => opts[:noindex] || false,
         },
-        :body => [feeds].flatten.map{|e| "feed[]=#{e}"}.join("&")
+        :body => build_body(feeds, 'feed')
       }
 
-      http = post('http://api.postrank.com/v2/feed/info', req)
+      http = post("#{V2_API_BASE}/feed/info", req)
       resp = parse(http.response)
 
       resp.key?('items') ? resp['items'] : resp
@@ -39,7 +40,7 @@ module PostRank
         }
       }
 
-      http = get('http://api.postrank.com/v2/feed/', req)
+      http = get("#{V2_API_BASE}/feed/", req)
       parse(http.response)
     end
 
@@ -53,7 +54,7 @@ module PostRank
         }
       }
 
-      http = get('http://api.postrank.com/v2/feed/topposts/', req)
+      http = get("#{V2_API_BASE}/feed/topposts/", req)
       parse(http.response)
     end
 
@@ -69,12 +70,12 @@ module PostRank
           :start_time => Chronic.parse(opts[:start_time]).to_i,
           :end_time   => Chronic.parse(opts[:end_time]).to_i
         },
-        :body => [feeds].flatten.map{|e| "feed[]=#{e}"}.join("&")
+        :body => build_body(feeds, 'feed')
       }
 
       req[:query][:summary] = opts[:summary] if opts[:summary]
 
-      http = post('http://api.postrank.com/v2/feed/engagement', req)
+      http = post("#{V2_API_BASE}/feed/engagement", req)
       parse(http.response)
     end
 
@@ -83,7 +84,6 @@ module PostRank
       urls = [urls].flatten.map do |url|
         md5 = (url =~ /\w{32}/) ? url : Digest::MD5.hexdigest(url)
         reverse[md5] = url
-
         md5
       end
 
@@ -91,10 +91,10 @@ module PostRank
         :query => {
           :appkey => @appkey,
         },
-        :body => urls.map{|e| "url[]=#{e}"}.join("&")
+        :body => build_body(urls, 'url')
       }
 
-      http = post('http://api.postrank.com/v2/entry/metrics', req)
+      http = post("#{V2_API_BASE}/entry/metrics", req)
       parse(http.response).inject({}) do |hash, v|
         hash[reverse[v[0]]] = v[1]
         hash
@@ -109,9 +109,12 @@ module PostRank
         rescue Exception => e
           puts "Failed to parse request:"
           puts e.message
-          puts e.backtrace[0,5].join("\n")
-
+          puts e.backtrace[0, 5].join("\n")
         end
+      end
+
+      def build_body(urls, key)
+        [urls].flatten.map { |e| "#{key}[]=#{e}" }.join("&")
       end
 
       def post(url, req)
@@ -131,9 +134,7 @@ module PostRank
             EM.stop
           end
         end
-
         http
       end
-
   end
 end
