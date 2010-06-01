@@ -1,5 +1,5 @@
 require 'spec'
-require 'lib/postrank/api'
+require 'lib/postrank-api'
 require 'pp'
 
 describe PostRank::API do
@@ -37,7 +37,15 @@ describe PostRank::API do
       end
     end
 
-    it "should return feed info data in-order"
+    it "should return feed info data in-order" do
+      EM.synchrony do
+        feeds = api.feed_info(:feed => ['igvita.com', 'everburning.com'])
+        feeds.class.should == Array
+        feeds.first['xml'].should match('igvita.com')
+
+        EM.stop
+      end
+    end
   end
 
   describe "Feed API" do
@@ -111,13 +119,13 @@ describe PostRank::API do
         eng = api.feed_engagement({
                                     :feed => [IGVITA, EVERBURNING],
                                     :summary => false,
-                                    :start_time => 'yesterday'
+                                    :start_time => 'yesterday',
+                                    :end_time => 'today'
         })
 
         eng.class.should == Hash
         eng.keys.size.should == 2
-        eng[IGVITA].keys.size.should == 1
-        eng[EVERBURNING].keys.size.should == 1
+        eng[IGVITA].keys.size.should == 2
 
         EM.stop
       end
@@ -147,6 +155,13 @@ describe PostRank::API do
         EM.stop
       end
     end
+  end
+
+  it "should invoke and kill EM reactor transparently" do
+    metrics = api.metrics(:url => ['1c1a5357e8bd00128db845b2595d5ebe'])
+
+    metrics.keys.size.should == 1
+    metrics['1c1a5357e8bd00128db845b2595d5ebe'].class.should == Hash
   end
 
 end

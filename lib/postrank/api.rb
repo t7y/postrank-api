@@ -1,4 +1,6 @@
 require 'em-synchrony'
+require 'em-synchrony/em-http'
+
 require 'digest/md5'
 require 'chronic'
 require 'json'
@@ -21,7 +23,7 @@ module PostRank
         :body => [opts[:feed]].flatten.map{|e| "feed[]=#{e}"}.join("&")
       }
 
-      http = EM::HttpRequest.new('http://api.postrank.com/v2/feed/info').post(req)
+      http = post('http://api.postrank.com/v2/feed/info', req)
       resp = parse(http.response)
 
       resp.key?('items') ? resp['items'] : resp
@@ -39,7 +41,7 @@ module PostRank
         }
       }
 
-      http = EM::HttpRequest.new('http://api.postrank.com/v2/feed/').get(req)
+      http = get('http://api.postrank.com/v2/feed/', req)
       parse(http.response)
     end
 
@@ -53,7 +55,7 @@ module PostRank
         }
       }
 
-      http = EM::HttpRequest.new('http://api.postrank.com/v2/feed/topposts/').get(req)
+      http = get('http://api.postrank.com/v2/feed/topposts/', req)
       parse(http.response)
     end
 
@@ -75,7 +77,7 @@ module PostRank
       # TODO: fix in the API.. summary=false should not do summary!
       req[:query][:summary] = opts[:summary] if opts[:summary]
 
-      http = EM::HttpRequest.new('http://api.postrank.com/v2/feed/engagement').post(req)
+      http = post('http://api.postrank.com/v2/feed/engagement', req)
       parse(http.response)
     end
 
@@ -95,7 +97,7 @@ module PostRank
         :body => urls.map{|e| "url[]=#{e}"}.join("&")
       }
 
-      http = EM::HttpRequest.new('http://api.postrank.com/v2/entry/metrics').post(req)
+      http = post('http://api.postrank.com/v2/entry/metrics', req)
       parse(http.response).inject({}) do |hash, v|
         hash[reverse[v[0]]] = v[1]
         hash
@@ -115,6 +117,28 @@ module PostRank
 
         end
       end
+
+      def post(url, req)
+        dispatch(:post, url, req)
+      end
+
+      def get(url, req)
+        dispatch(:get, url, req)
+      end
+
+      def dispatch(method, url, req)
+        if EM.reactor_running?
+          http = EM::HttpRequest.new(url).send(method, req)
+        else
+          EM.synchrony do
+            http = EM::HttpRequest.new(url).send(method, req)
+            EM.stop
+          end
+        end
+
+        http
+      end
+
 
   end
 end
