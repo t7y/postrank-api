@@ -3,7 +3,6 @@ require 'em-synchrony/em-http'
 
 require 'digest/md5'
 require 'chronic'
-require 'json'
 require 'yajl'
 
 module PostRank
@@ -11,7 +10,6 @@ module PostRank
 
     def initialize(appkey)
       @appkey = appkey
-      @parser = Yajl::Parser.new
     end
 
     def feed_info(feeds, opts = {})
@@ -69,7 +67,7 @@ module PostRank
           :appkey     => @appkey,
           :mode       => opts[:mode] || 'daily',
           :start_time => Chronic.parse(opts[:start_time]).to_i,
-          :end_time => Chronic.parse(opts[:end_time]).to_i
+          :end_time   => Chronic.parse(opts[:end_time]).to_i
         },
         :body => [feeds].flatten.map{|e| "feed[]=#{e}"}.join("&")
       }
@@ -107,8 +105,7 @@ module PostRank
 
       def parse(data)
         begin
-          JSON.parse(data)
-          # @parser.parse(data)
+          Yajl::Parser.parse(data)
         rescue Exception => e
           puts "Failed to parse request:"
           puts e.message
