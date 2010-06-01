@@ -9,18 +9,18 @@ require 'yajl'
 module PostRank
   class API
 
-    def initialize(opts)
-      @appkey = opts[:appkey]
+    def initialize(appkey)
+      @appkey = appkey
       @parser = Yajl::Parser.new
     end
 
-    def feed_info(opts)
+    def feed_info(feeds, opts = {})
       req = {
         :query => {
           :appkey => @appkey,
           :noidex => opts[:noindex] || false,
         },
-        :body => [opts[:feed]].flatten.map{|e| "feed[]=#{e}"}.join("&")
+        :body => [feeds].flatten.map{|e| "feed[]=#{e}"}.join("&")
       }
 
       http = post('http://api.postrank.com/v2/feed/info', req)
@@ -29,7 +29,7 @@ module PostRank
       resp.key?('items') ? resp['items'] : resp
     end
 
-    def feed(opts)
+    def feed(feed, opts = {})
       req = {
         :query => {
           :appkey => @appkey,
@@ -37,7 +37,7 @@ module PostRank
           :q      => opts[:q]     || '',
           :num    => opts[:num]   || 10,
           :start  => opts[:start] || 0,
-          :id     => opts[:feed]
+          :id     => feed
         }
       }
 
@@ -45,13 +45,13 @@ module PostRank
       parse(http.response)
     end
 
-    def top_posts(opts)
+    def top_posts(feed, opts = {})
       req = {
         :query => {
           :appkey => @appkey,
           :q      => opts[:q]     || '',
           :num    => opts[:num]   || 10,
-          :id     => opts[:feed]
+          :id     => feed
         }
       }
 
@@ -59,7 +59,7 @@ module PostRank
       parse(http.response)
     end
 
-    def feed_engagement(opts)
+    def feed_engagement(feeds, opts = {})
       opts[:start_time] ||= '1 month ago'
       opts[:end_time]   ||= 'today'
       opts[:summary]    = true if not opts.key?(:summary)
@@ -71,19 +71,18 @@ module PostRank
           :start_time => Chronic.parse(opts[:start_time]).to_i,
           :end_time => Chronic.parse(opts[:end_time]).to_i
         },
-        :body => [opts[:feed]].flatten.map{|e| "feed[]=#{e}"}.join("&")
+        :body => [feeds].flatten.map{|e| "feed[]=#{e}"}.join("&")
       }
 
-      # TODO: fix in the API.. summary=false should not do summary!
       req[:query][:summary] = opts[:summary] if opts[:summary]
 
       http = post('http://api.postrank.com/v2/feed/engagement', req)
       parse(http.response)
     end
 
-    def metrics(opts)
+    def metrics(urls, opts = {})
       reverse = {}
-      urls = [opts[:url]].flatten.map do |url|
+      urls = [urls].flatten.map do |url|
         md5 = (url =~ /\w{32}/) ? url : Digest::MD5.hexdigest(url)
         reverse[md5] = url
 
@@ -138,7 +137,6 @@ module PostRank
 
         http
       end
-
 
   end
 end
