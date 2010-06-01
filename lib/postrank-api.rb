@@ -1,1 +1,1 @@
-require 'postrank/api'
+require 'postrank-api/api'
