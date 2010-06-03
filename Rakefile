@@ -9,10 +9,11 @@ begin
     gemspec.email = "ilya@igvita.com"
     gemspec.homepage = "http://github.com/postrank/postrank-api"
     gemspec.authors = ["Ilya Grigorik"]
-    gemspec.add_dependency('eventmachine', '>= 0.12.9')
     gemspec.required_ruby_version = ">= 1.9.1"
-    gemspec.rubyforge_project = "em-http"
-    gemspec.rubyforge_project = "em-synchrony"
+    gemspec.add_dependency('eventmachine', '>= 0.12.9')
+    gemspec.add_dependency('em-http')
+    gemspec.add_dependency('em-synchrony')
+    gemspec.rubyforge_project = "postrank-api"
   end
 
   Jeweler::GemcutterTasks.new
