@@ -11,7 +11,7 @@ begin
     gemspec.authors = ["Ilya Grigorik"]
     gemspec.required_ruby_version = ">= 1.9.1"
     gemspec.add_dependency('eventmachine', '>= 0.12.9')
-    gemspec.add_dependency('em-http')
+    gemspec.add_dependency('em-http-request')
     gemspec.add_dependency('em-synchrony')
     gemspec.rubyforge_project = "postrank-api"
   end

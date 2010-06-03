@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{postrank-api}
-  s.version = "0.1.0"
+  s.version = "0.1.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Ilya Grigorik"]
@@ -21,6 +21,7 @@ Gem::Specification.new do |s|
      "VERSION",
      "lib/postrank-api.rb",
      "lib/postrank-api/api.rb",
+     "postrank-api.gemspec",
      "spec/api_spec.rb"
   ]
   s.homepage = %q{http://github.com/postrank/postrank-api}
@@ -40,16 +41,16 @@ Gem::Specification.new do |s|
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<eventmachine>, [">= 0.12.9"])
-      s.add_runtime_dependency(%q<em-http>, [">= 0"])
+      s.add_runtime_dependency(%q<em-http-request>, [">= 0"])
       s.add_runtime_dependency(%q<em-synchrony>, [">= 0"])
     else
       s.add_dependency(%q<eventmachine>, [">= 0.12.9"])
-      s.add_dependency(%q<em-http>, [">= 0"])
+      s.add_dependency(%q<em-http-request>, [">= 0"])
       s.add_dependency(%q<em-synchrony>, [">= 0"])
     end
   else
     s.add_dependency(%q<eventmachine>, [">= 0.12.9"])
-    s.add_dependency(%q<em-http>, [">= 0"])
+    s.add_dependency(%q<em-http-request>, [">= 0"])
     s.add_dependency(%q<em-synchrony>, [">= 0"])
   end
 end
