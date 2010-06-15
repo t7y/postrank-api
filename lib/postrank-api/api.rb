@@ -79,6 +79,23 @@ module PostRank
       parse(http.response)
     end
 
+    def domain_activity(domains, opts = {})
+      opts[:start_time] ||= '1 month ago'
+      opts[:end_time]   ||= 'today'
+
+      req = {
+        :query => {
+          :appkey     => @appkey,
+          :start_time => Chronic.parse(opts[:start_time]).to_i,
+          :end_time   => Chronic.parse(opts[:end_time]).to_i
+        },
+        :body => build_body(domains, 'domain')
+      }
+
+      http = post("#{V2_API_BASE}/domain/activity", req)
+      parse(http.response)
+    end
+
     def metrics(urls, opts = {})
       reverse = {}
       urls = [urls].flatten.map do |url|

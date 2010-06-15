@@ -140,6 +140,33 @@ describe PostRank::API do
     end
   end
 
+  describe "Domain API" do
+    it "should fetch metrics for a collection of domains" do
+      EM.synchrony do
+        activity = api.domain_activity('igvita.com')
+        activity.keys.size.should == 1
+        activity['igvita.com'].class.should == Hash
+
+        EM.stop
+      end
+    end
+
+    it "should fetch daily activity for multiple domains" do
+      EM.synchrony do
+        act = api.domain_activity(['igvita.com', 'techcrunch.com'], {
+                                    :start_time => 'yesterday',
+                                    :end_time => 'today'
+        })
+
+        act.class.should == Hash
+        act.keys.size.should == 2
+
+        EM.stop
+      end
+    end
+
+  end
+
   it "should invoke and kill EM reactor transparently" do
     metrics = api.metrics('1c1a5357e8bd00128db845b2595d5ebe')
 
