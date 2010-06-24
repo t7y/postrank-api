@@ -13,6 +13,7 @@ begin
     gemspec.add_dependency('eventmachine', '>= 0.12.9')
     gemspec.add_dependency('em-http-request')
     gemspec.add_dependency('em-synchrony')
+    gemspec.add_dependency('yajl-ruby')
     gemspec.rubyforge_project = "postrank-api"
   end
 
