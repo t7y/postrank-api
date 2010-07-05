@@ -60,8 +60,8 @@ module PostRank
 
     def metrics_versioned(posts, opts = {})
 
-      start_time = opts[:start_time] || 'yesterday'
-      end_time = opts[:end_time] || 'today'
+      start_time = opts[:start] || 'yesterday'
+      end_time = opts[:end] || 'today'
 
      req = {
         :query => {

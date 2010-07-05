@@ -109,7 +109,7 @@ describe PostRank::API do
  describe "Metrics Versioned API" do
     it "should fetch metrics for a single post" do
       EM.synchrony do
-        met = api.metrics_versioned('b0432f947bc0d44766d046bfc3c15043', {:start_time => '5 years ago', :end_time => 'today'})
+        met = api.metrics_versioned('b0432f947bc0d44766d046bfc3c15043', {:start => '5 years ago', :end => 'today'})
         met.class.should == Hash
         met.keys.size.should == 1
         EM.stop
@@ -117,7 +117,7 @@ describe PostRank::API do
     end
     it "should fetch metrics for multiple posts" do
       EM.synchrony do
-        met = api.metrics_versioned(['b0432f947bc0d44766d046bfc3c15043', 'a020c1c3a5b2aef1ab4a7307cf3d2cb6'], {:start_time => '5 years ago', :end_time => 'today'})
+        met = api.metrics_versioned(['b0432f947bc0d44766d046bfc3c15043', 'a020c1c3a5b2aef1ab4a7307cf3d2cb6'], {:start => '5 years ago', :end => 'today'})
         met.class.should == Hash
         met.keys.size.should == 2
         EM.stop

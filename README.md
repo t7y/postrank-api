@@ -27,3 +27,12 @@ For complete documentation on all endpoints please see [PostRank API Docs](http:
 
     # lookup social metrics for a url
     metrics = api.metrics('http://www.igvita.com/')
+
+    # get recommended feeds
+    recommendations = api.recommendations(igvita['id'])
+
+    #lookup relative postranks for given posts
+    postrank = api.postrank(top['items'].collect!{|info| info['original_link']})
+
+    #lookup metrics history for a given post hash
+    history = api.postrank(top['items'].first['id'], :start => '1 month ago')
