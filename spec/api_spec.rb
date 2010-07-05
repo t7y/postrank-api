@@ -5,7 +5,6 @@ require 'pp'
 describe PostRank::API do
   IGVITA = '421df2d86ab95100de7dcc2e247a08ab'
   EVERBURNING = 'cb3e81ac96fb0ada1212dfce4f329474'
-
   let(:api) { PostRank::API.new('test') }
 
   it "should initialize with appkey" do
@@ -71,6 +70,28 @@ describe PostRank::API do
     end
   end
 
+  describe "Recommendations API" do
+
+    it "should fetch recommendations for a single feed" do
+       EM.synchrony do
+          resp = api.recommendations(IGVITA)
+            resp.class.should == Array
+          EM.stop
+        end
+      end
+
+    it "should fetch recommendation for a set of feeds" do
+     EM.synchrony do
+        resp = api.recommendations([IGVITA, EVERBURNING], :num => 1)
+
+          resp.class.should == Array
+          resp.size.should == 1
+
+        EM.stop
+      end
+    end
+  end
+
   describe "Top Posts API" do
     it "should fetch top posts for a feed" do
       EM.synchrony do
@@ -81,6 +102,44 @@ describe PostRank::API do
         feed['items'].size.should == 1
 
         EM.stop
+      end
+    end
+  end
+
+ describe "Metrics Versioned API" do
+    it "should fetch metrics for a single post" do
+      EM.synchrony do
+        met = api.metrics_versioned('b0432f947bc0d44766d046bfc3c15043', {:start_time => '5 years ago', :end_time => 'today'})
+        met.class.should == Hash
+        met.keys.size.should == 1
+        EM.stop
+      end
+    end
+    it "should fetch metrics for multiple posts" do
+      EM.synchrony do
+        met = api.metrics_versioned(['b0432f947bc0d44766d046bfc3c15043', 'a020c1c3a5b2aef1ab4a7307cf3d2cb6'], {:start_time => '5 years ago', :end_time => 'today'})
+        met.class.should == Hash
+        met.keys.size.should == 2
+        EM.stop
+      end
+    end
+  end
+
+  describe "Postrank API" do
+    it "should fetch postrank with respect to provided urls" do
+      EM.synchrony do
+          pr = api.postrank(['http://www.igvita.com/2008/06/19/splunk-your-distributed-logs-in-ec2/', 'http://www.igvita.com/2008/02/11/nginx-and-memcached-a-400-boost/'])
+          pr.class.should == Hash
+          pr.keys.size.should == 2
+        EM.stop
+       end
+    end
+    it "should fetch postrank with respect specific feeds" do
+      EM.synchrony do
+        pr = api.postrank(['http://www.igvita.com/2008/06/19/splunk-your-distributed-logs-in-ec2/', 'http://www.igvita.com/2008/02/11/nginx-and-memcached-a-400-boost/'], ['421df2d86ab95100de7dcc2e247a08ab'])
+        pr.class.should == Hash
+        pr.keys.size.should == 2
+       EM.stop
       end
     end
   end
@@ -169,7 +228,6 @@ describe PostRank::API do
 
   it "should invoke and kill EM reactor transparently" do
     metrics = api.metrics('1c1a5357e8bd00128db845b2595d5ebe')
-
     metrics.keys.size.should == 1
     metrics['1c1a5357e8bd00128db845b2595d5ebe'].class.should == Hash
   end

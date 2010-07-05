@@ -7,6 +7,7 @@ require 'yajl'
 
 module PostRank
   class API
+    V1_API_BASE = 'http://api.postrank.com/v1'
     V2_API_BASE = 'http://api.postrank.com/v2'
 
     def initialize(appkey)
@@ -43,6 +44,50 @@ module PostRank
       http = get("#{V2_API_BASE}/feed/", req)
       parse(http.response)
     end
+
+    def recommendations(feeds, opts = {})  
+      req = {
+        :query => {
+          :appkey => @appkey,
+          :num => opts[:num] || 10
+        },
+      :body => build_body(feeds, 'feed')
+      }
+
+      http = post("#{V2_API_BASE}/recommend", req)
+      parse(http.response)
+    end
+
+    def metrics_versioned(posts, opts = {})
+
+      start_time = opts[:start_time] || 'yesterday'
+      end_time = opts[:end_time] || 'today'
+
+     req = {
+        :query => {
+          :appkey => @appkey,
+          :min_time => Chronic.parse(start_time).to_i,
+          :max_time => Chronic.parse(end_time).to_i
+        },
+        :body => build_body( posts, 'post_hash')
+      }
+      
+      http = post("#{V2_API_BASE}/entry/metrics/historic", req)
+      parse(http.response)
+    end
+
+    def postrank(urls, feeds = [], opts = {})
+      req = {
+        :query => {
+          :appkey => @appkey,
+          :format => 'json',
+        },
+        :body => (build_body(urls, 'url'))+"&"+(build_body(feeds, 'feed_hash'))
+      }
+      http = post("#{V1_API_BASE}/postrank", req)
+      parse(http.response)
+    end
+
 
     def top_posts(feed, opts = {})
       req = {
@@ -142,6 +187,14 @@ module PostRank
         dispatch(:get, url, req)
       end
 
+      def build_body(urls, key)
+        [urls].flatten.map { |e| "#{key}[]=#{e}" }.join("&")
+      end
+
+      def post(url, req)
+        dispatch(:post, url, req)
+      end
+
       def dispatch(method, url, req)
         if EM.reactor_running?
           http = EM::HttpRequest.new(url).send(method, req)
@@ -153,5 +206,5 @@ module PostRank
         end
         http
       end
-  end
+end
 end
