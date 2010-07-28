@@ -14,6 +14,7 @@ begin
     gemspec.add_dependency('em-http-request')
     gemspec.add_dependency('em-synchrony')
     gemspec.add_dependency('yajl-ruby')
+    gemspec.add_dependency('chronic')
     gemspec.rubyforge_project = "postrank-api"
   end
 

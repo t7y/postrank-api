@@ -45,13 +45,13 @@ module PostRank
       parse(http.response)
     end
 
-    def recommendations(feeds, opts = {})  
+    def recommendations(feeds, opts = {})
       req = {
         :query => {
           :appkey => @appkey,
           :num => opts[:num] || 10
         },
-      :body => build_body(feeds, 'feed')
+        :body => build_body(feeds, 'feed')
       }
 
       http = post("#{V2_API_BASE}/recommend", req)
@@ -59,19 +59,18 @@ module PostRank
     end
 
     def metrics_versioned(posts, opts = {})
+      opts[:start_time] ||= 'yesterday'
+      opts[:end_time]   ||= 'today'
 
-      start_time = opts[:start] || 'yesterday'
-      end_time = opts[:end] || 'today'
-
-     req = {
+      req = {
         :query => {
           :appkey => @appkey,
-          :min_time => Chronic.parse(start_time).to_i,
-          :max_time => Chronic.parse(end_time).to_i
+          :min_time => Chronic.parse(opts[:start_time]).to_i,
+          :max_time => Chronic.parse(opts[:start_time]).to_i
         },
         :body => build_body( posts, 'post_hash')
       }
-      
+
       http = post("#{V2_API_BASE}/entry/metrics/historic", req)
       parse(http.response)
     end
@@ -206,5 +205,5 @@ module PostRank
         end
         http
       end
-end
+  end
 end

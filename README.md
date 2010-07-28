@@ -23,7 +23,7 @@ For complete documentation on all endpoints please see [PostRank API Docs](http:
     top    = api.top_posts(igvita['id'], :num => 1)
 
     # lookup the engagement score for the past two days
-    eng    = api.engagement(igvita['id'], :start => 'yesterday')
+    eng    = api.feed_engagement(igvita['id'], :start_time => 'yesterday')
 
     # lookup social metrics for a url
     metrics = api.metrics('http://www.igvita.com/')
@@ -31,8 +31,8 @@ For complete documentation on all endpoints please see [PostRank API Docs](http:
     # get recommended feeds
     recommendations = api.recommendations(igvita['id'])
 
-    #lookup relative postranks for given posts
+    # lookup thematic postranks for given posts
     postrank = api.postrank(top['items'].collect!{|info| info['original_link']})
 
-    #lookup metrics history for a given post hash
-    history = api.postrank(top['items'].first['id'], :start => '1 month ago')
+    # lookup metrics history for a given post hash
+    history = api.postrank(top['items'].first['id'])
