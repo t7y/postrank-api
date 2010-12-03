@@ -131,7 +131,8 @@ module PostRank
         :query => {
           :appkey     => @appkey,
           :start_time => Chronic.parse(opts[:start_time]).to_i,
-          :end_time   => Chronic.parse(opts[:end_time]).to_i
+          :end_time   => Chronic.parse(opts[:end_time]).to_i,
+          :mode       => opts[:mode]
         },
         :body => build_body(domains, 'domain')
       }
