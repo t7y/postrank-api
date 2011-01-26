@@ -9,6 +9,7 @@ module PostRank
   class API
     V1_API_BASE = 'http://api.postrank.com/v1'
     V2_API_BASE = 'http://api.postrank.com/v2'
+    V3_API_BASE = 'http://api.postrank.com/v3'
 
     def initialize(appkey)
       @appkey = appkey
@@ -41,20 +42,7 @@ module PostRank
         }
       }
 
-      http = get("#{V2_API_BASE}/feed/", req)
-      parse(http.response)
-    end
-
-    def recommendations(feeds, opts = {})
-      req = {
-        :query => {
-          :appkey => @appkey,
-          :num => opts[:num] || 10
-        },
-        :body => build_body(feeds, 'feed')
-      }
-
-      http = post("#{V2_API_BASE}/recommend", req)
+      http = get("#{V3_API_BASE}/feed/", req)
       parse(http.response)
     end
 
@@ -66,7 +54,7 @@ module PostRank
         :query => {
           :appkey => @appkey,
           :min_time => Chronic.parse(opts[:start_time]).to_i,
-          :max_time => Chronic.parse(opts[:start_time]).to_i
+          :max_time => Chronic.parse(opts[:end_time]).to_i
         },
         :body => build_body( posts, 'post_hash')
       }
@@ -87,7 +75,6 @@ module PostRank
       parse(http.response)
     end
 
-
     def top_posts(feed, opts = {})
       req = {
         :query => {
@@ -98,7 +85,7 @@ module PostRank
         }
       }
 
-      http = get("#{V2_API_BASE}/feed/topposts/", req)
+      http = get("#{V3_API_BASE}/feed/topposts/", req)
       parse(http.response)
     end
 
@@ -156,7 +143,7 @@ module PostRank
         :body => build_body(urls, 'url')
       }
 
-      http = post("#{V2_API_BASE}/entry/metrics", req)
+      http = post("#{V3_API_BASE}/entry/metrics", req)
       parse(http.response).inject({}) do |hash, v|
         hash[reverse[v[0]]] = v[1]
         hash
@@ -185,14 +172,6 @@ module PostRank
 
       def get(url, req)
         dispatch(:get, url, req)
-      end
-
-      def build_body(urls, key)
-        [urls].flatten.map { |e| "#{key}[]=#{e}" }.join("&")
-      end
-
-      def post(url, req)
-        dispatch(:post, url, req)
       end
 
       def dispatch(method, url, req)

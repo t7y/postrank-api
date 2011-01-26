@@ -70,28 +70,6 @@ describe PostRank::API do
     end
   end
 
-  describe "Recommendations API" do
-
-    it "should fetch recommendations for a single feed" do
-       EM.synchrony do
-          resp = api.recommendations(IGVITA)
-            resp.class.should == Array
-          EM.stop
-        end
-      end
-
-    it "should fetch recommendation for a set of feeds" do
-     EM.synchrony do
-        resp = api.recommendations([IGVITA, EVERBURNING], :num => 1)
-
-          resp.class.should == Array
-          resp.size.should == 1
-
-        EM.stop
-      end
-    end
-  end
-
   describe "Top Posts API" do
     it "should fetch top posts for a feed" do
       EM.synchrony do
@@ -109,7 +87,7 @@ describe PostRank::API do
  describe "Metrics Versioned API" do
     it "should fetch metrics for a single post" do
       EM.synchrony do
-        met = api.metrics_versioned('b0432f947bc0d44766d046bfc3c15043', {:start => '5 years ago', :end => 'today'})
+        met = api.metrics_versioned('cd116fcfb7df471e3a2ba2065b3499bb', {:start => '5 years ago', :end => 'today'})
         met.class.should == Hash
         met.keys.size.should == 1
         EM.stop
