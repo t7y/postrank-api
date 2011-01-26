@@ -1,24 +1,9 @@
-require 'rake'
+require 'bundler'
+Bundler::GemHelper.install_tasks
 
-begin
-  require 'jeweler'
-  Jeweler::Tasks.new do |gemspec|
-    gemspec.name = "postrank-api"
-    gemspec.summary = "PostRank API Wrapper"
-    gemspec.description = gemspec.summary
-    gemspec.email = "ilya@igvita.com"
-    gemspec.homepage = "http://github.com/postrank/postrank-api"
-    gemspec.authors = ["Ilya Grigorik"]
-    gemspec.required_ruby_version = ">= 1.9.1"
-    gemspec.add_dependency('eventmachine', '>= 0.12.9')
-    gemspec.add_dependency('em-http-request')
-    gemspec.add_dependency('em-synchrony')
-    gemspec.add_dependency('yajl-ruby')
-    gemspec.add_dependency('chronic')
-    gemspec.rubyforge_project = "postrank-api"
-  end
+require 'rspec'
+require 'rspec/core/rake_task'
 
-  Jeweler::GemcutterTasks.new
-rescue LoadError
-  puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
+Rspec::Core::RakeTask.new do |t|
+  t.rspec_opts = '--color'
 end

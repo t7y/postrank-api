@@ -1,4 +1,4 @@
-require 'spec'
+require 'rspec'
 require 'lib/postrank-api'
 require 'pp'
 
