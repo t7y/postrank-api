@@ -84,18 +84,19 @@ describe PostRank::API do
     end
   end
 
- describe "Metrics Versioned API" do
+  describe "Metrics Versioned API" do
     it "should fetch metrics for a single post" do
       EM.synchrony do
-        met = api.metrics_versioned('cd116fcfb7df471e3a2ba2065b3499bb', {:start => '5 years ago', :end => 'today'})
+        met = api.metrics_versioned('cd116fcfb7df471e3a2ba2065b3499bb', {:start_time => '5 years ago'})
         met.class.should == Hash
         met.keys.size.should == 1
         EM.stop
       end
     end
+
     it "should fetch metrics for multiple posts" do
       EM.synchrony do
-        met = api.metrics_versioned(['b0432f947bc0d44766d046bfc3c15043', 'a020c1c3a5b2aef1ab4a7307cf3d2cb6'], {:start => '5 years ago', :end => 'today'})
+        met = api.metrics_versioned(['b0432f947bc0d44766d046bfc3c15043', 'a020c1c3a5b2aef1ab4a7307cf3d2cb6'], {:start_time => '5 years ago', :end_time => 'today'})
         met.class.should == Hash
         met.keys.size.should == 2
         EM.stop
@@ -106,18 +107,19 @@ describe PostRank::API do
   describe "Postrank API" do
     it "should fetch postrank with respect to provided urls" do
       EM.synchrony do
-          pr = api.postrank(['http://www.igvita.com/2008/06/19/splunk-your-distributed-logs-in-ec2/', 'http://www.igvita.com/2008/02/11/nginx-and-memcached-a-400-boost/'])
-          pr.class.should == Hash
-          pr.keys.size.should == 2
+        pr = api.postrank(['http://www.igvita.com/2008/06/19/splunk-your-distributed-logs-in-ec2/', 'http://www.igvita.com/2008/02/11/nginx-and-memcached-a-400-boost/'])
+        pr.class.should == Hash
+        pr.keys.size.should == 2
         EM.stop
-       end
+      end
     end
+
     it "should fetch postrank with respect specific feeds" do
       EM.synchrony do
         pr = api.postrank(['http://www.igvita.com/2008/06/19/splunk-your-distributed-logs-in-ec2/', 'http://www.igvita.com/2008/02/11/nginx-and-memcached-a-400-boost/'], ['421df2d86ab95100de7dcc2e247a08ab'])
         pr.class.should == Hash
         pr.keys.size.should == 2
-       EM.stop
+        EM.stop
       end
     end
   end

@@ -1,5 +1,6 @@
 require 'em-synchrony'
 require 'em-synchrony/em-http'
+require 'postrank-uri'
 
 require 'digest/md5'
 require 'chronic'
@@ -7,9 +8,10 @@ require 'yajl'
 
 module PostRank
   class API
-    V1_API_BASE = 'http://api.postrank.com/v1'
-    V2_API_BASE = 'http://api.postrank.com/v2'
-    V3_API_BASE = 'http://api.postrank.com/v3'
+    API_BASE    = 'http://api.postrank.com'
+    V1_API_BASE = API_BASE + '/v1'
+    V2_API_BASE = API_BASE + '/v2'
+    V3_API_BASE = API_BASE + '/v3'
 
     def initialize(appkey)
       @appkey = appkey
@@ -53,10 +55,10 @@ module PostRank
       req = {
         :query => {
           :appkey => @appkey,
-          :min_time => Chronic.parse(opts[:start_time]).to_i,
-          :max_time => Chronic.parse(opts[:end_time]).to_i
+          :start_time => Chronic.parse(opts[:start_time]).to_i,
+          :end_time => Chronic.parse(opts[:end_time]).to_i
         },
-        :body => build_body( posts, 'post_hash')
+        :body => build_body(posts, 'post_hash')
       }
 
       http = post("#{V2_API_BASE}/entry/metrics/historic", req)
@@ -163,7 +165,13 @@ module PostRank
       end
 
       def build_body(urls, key)
-        [urls].flatten.map { |e| "#{key}[]=#{e}" }.join("&")
+        [urls].flatten.map do |e|
+          if key == "url" && e !~ /\w{32}/
+            e = PostRank::URI.clean(e)
+          end
+
+          "#{key}[]=#{e}"
+        end.join("&")
       end
 
       def post(url, req)

@@ -14,6 +14,7 @@ Gem::Specification.new do |s|
 
   s.rubyforge_project = "postrank-api"
 
+  s.add_dependency "postrank-uri"
   s.add_dependency "eventmachine"
   s.add_dependency "em-http-request"
   s.add_dependency "em-synchrony"
