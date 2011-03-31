@@ -170,8 +170,14 @@ module PostRank
 
       def parse(data)
         begin
-          Yajl::Parser.parse(data)
-        rescue Exception => e
+          data = Yajl::Parser.parse(data)
+
+          if msg = data['error']
+            raise Exception.new(msg)
+          end
+
+          data
+        rescue Yajl::ParseError => e
           puts "Failed to parse request:"
           puts e.message
           puts e.backtrace[0, 5].join("\n")
