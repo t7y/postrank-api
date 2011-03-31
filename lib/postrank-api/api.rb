@@ -152,6 +152,20 @@ module PostRank
       end
     end
 
+    def top_posts(feed, opts = {})
+      req = {
+        :query => {
+          :appkey => @appkey,
+          :q      => opts[:q]     || '',
+          :num    => opts[:num]   || 10,
+          :id     => feed
+        }
+      }
+
+      http = get("#{V3_API_BASE}/feed/topposts/", req)
+      parse(http.response)
+    end
+
     private
 
       def parse(data)
